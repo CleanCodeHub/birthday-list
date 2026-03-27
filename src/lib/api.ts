@@ -1,5 +1,3 @@
-const API_BASE_URL = '/api';
-
 let authToken: string | null = null;
 
 export interface RSVP {
@@ -35,7 +33,7 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     headers['Authorization'] = `Bearer ${authToken}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(endpoint, {
     ...options,
     headers,
   });
@@ -50,7 +48,7 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
 export const api = {
   async getRsvps(): Promise<RSVP[]> {
-    const data = await fetchAPI('/rsvps.php');
+    const data = await fetchAPI('api/rsvps.php');
     return data.map((rsvp: any) => ({
       ...rsvp,
       attending: Boolean(rsvp.attending)
@@ -58,7 +56,7 @@ export const api = {
   },
 
   async createRsvp(rsvpData: { name: string; attending: boolean; adults: number; kids: number; comment: string | null }) {
-    const result = await fetchAPI('/rsvps.php', {
+    const result = await fetchAPI('api/rsvps.php', {
       method: 'POST',
       body: JSON.stringify(rsvpData),
     });
@@ -66,7 +64,7 @@ export const api = {
   },
 
   async updateRsvp(id: string, rsvpData: { name: string; attending: boolean; adults: number; kids: number; comment: string | null }) {
-    const result = await fetchAPI('/rsvps.php', {
+    const result = await fetchAPI('api/rsvps.php', {
       method: 'PUT',
       body: JSON.stringify({ id, ...rsvpData }),
     });
@@ -74,14 +72,14 @@ export const api = {
   },
 
   async deleteRsvp(id: string) {
-    const result = await fetchAPI(`/rsvps.php?id=${id}`, {
+    const result = await fetchAPI(`api/rsvps.php?id=${id}`, {
       method: 'DELETE',
     });
     return result;
   },
 
   async deleteAllRsvps() {
-    const result = await fetchAPI('/rsvps.php?id=all', {
+    const result = await fetchAPI('api/rsvps.php?id=all', {
       method: 'DELETE',
     });
     return result;
@@ -89,7 +87,7 @@ export const api = {
 
   async login(email: string, password: string): Promise<AuthResponse> {
     try {
-      const result = await fetchAPI('/auth.php', {
+      const result = await fetchAPI('api/auth.php', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
@@ -108,7 +106,7 @@ export const api = {
 
   async logout() {
     try {
-      await fetchAPI('/auth.php', {
+      await fetchAPI('api/auth.php', {
         method: 'DELETE',
       });
     } catch (error) {
@@ -130,7 +128,7 @@ export const api = {
     }
 
     try {
-      const result = await fetchAPI('/auth.php');
+      const result = await fetchAPI('api/auth.php');
       return { authenticated: result.authenticated };
     } catch (error) {
       authToken = null;
@@ -141,7 +139,7 @@ export const api = {
 
   async getBirthdayInfo(): Promise<BirthdayInfo | null> {
     try {
-      const data = await fetchAPI('/rsvps.php?action=get_birthday_info');
+      const data = await fetchAPI('api/rsvps.php?action=get_birthday_info');
       return data.length > 0 ? data[0] : null;
     } catch (error) {
       return null;
@@ -149,7 +147,7 @@ export const api = {
   },
 
   async updateBirthdayInfo(name: string) {
-    const result = await fetchAPI('/rsvps.php', {
+    const result = await fetchAPI('api/rsvps.php', {
       method: 'PATCH',
       body: JSON.stringify({ birthday_person_name: name }),
     });

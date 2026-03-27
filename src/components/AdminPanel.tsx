@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Users, Baby, MessageSquare, CreditCard as Edit2, Trash2, Save, X, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Users, Baby, MessageSquare, CreditCard as Edit2, Trash2, Save, X, LogOut, Cake } from 'lucide-react';
 import { RSVP, api } from '../lib/supabase';
 
 interface AdminPanelProps {
@@ -11,9 +11,36 @@ interface AdminPanelProps {
 export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: '', adults: 0, kids: 0, comment: '' });
+  const [birthdayPersonName, setBirthdayPersonName] = useState('');
+  const [isEditingBirthday, setIsEditingBirthday] = useState(false);
   const totalAdults = rsvps.reduce((sum, rsvp) => sum + rsvp.adults, 0);
   const totalKids = rsvps.reduce((sum, rsvp) => sum + rsvp.kids, 0);
   const totalGuests = totalAdults + totalKids;
+
+  useEffect(() => {
+    loadBirthdayInfo();
+  }, []);
+
+  const loadBirthdayInfo = async () => {
+    try {
+      const info = await api.getBirthdayInfo();
+      if (info) {
+        setBirthdayPersonName(info.birthday_person_name);
+      }
+    } catch (err) {
+      console.error('Failed to load birthday info', err);
+    }
+  };
+
+  const handleSaveBirthdayName = async () => {
+    try {
+      await api.updateBirthdayInfo(birthdayPersonName);
+      setIsEditingBirthday(false);
+      onUpdate();
+    } catch (err) {
+      console.error('Failed to update birthday name', err);
+    }
+  };
 
   const handleEdit = (rsvp: RSVP) => {
     setEditingId(rsvp.id);
@@ -82,6 +109,52 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
           <LogOut className="w-4 h-4" />
           Logout
         </button>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Cake className="w-6 h-6 text-pink-500" />
+          <h3 className="text-xl font-bold text-gray-800">Birthday Person</h3>
+        </div>
+        {isEditingBirthday ? (
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={birthdayPersonName}
+              onChange={(e) => setBirthdayPersonName(e.target.value)}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              placeholder="Enter birthday person's name"
+            />
+            <button
+              onClick={handleSaveBirthdayName}
+              className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              <Save className="w-4 h-4" />
+              Save
+            </button>
+            <button
+              onClick={() => {
+                setIsEditingBirthday(false);
+                loadBirthdayInfo();
+              }}
+              className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              <X className="w-4 h-4" />
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <p className="text-2xl font-bold text-pink-600">{birthdayPersonName}</p>
+            <button
+              onClick={() => setIsEditingBirthday(true)}
+              className="flex items-center gap-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              <Edit2 className="w-4 h-4" />
+              Edit
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -12,6 +12,7 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [clickCount, setClickCount] = useState(0);
+  const [birthdayPersonName, setBirthdayPersonName] = useState('Birthday Person');
 
   const fetchRsvps = async () => {
     try {
@@ -23,14 +24,29 @@ function App() {
     setIsLoading(false);
   };
 
+  const fetchBirthdayInfo = async () => {
+    try {
+      const info = await api.getBirthdayInfo();
+      if (info) {
+        setBirthdayPersonName(info.birthday_person_name);
+      }
+    } catch (err) {
+      console.error('Failed to fetch birthday info', err);
+    }
+  };
+
   useEffect(() => {
     fetchRsvps();
+    fetchBirthdayInfo();
 
     api.checkSession().then((session) => {
       setIsAdmin(session.authenticated);
     });
 
-    const interval = setInterval(fetchRsvps, 5000);
+    const interval = setInterval(() => {
+      fetchRsvps();
+      fetchBirthdayInfo();
+    }, 5000);
 
     return () => {
       clearInterval(interval);
@@ -72,7 +88,7 @@ function App() {
               <Cake className="w-12 h-12 text-emerald-600" />
             </button>
             <h1 className="text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              Birthday Party RSVP
+              {birthdayPersonName}'s Birthday Party
             </h1>
           </div>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">

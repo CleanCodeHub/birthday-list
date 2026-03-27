@@ -9,6 +9,13 @@ export interface RSVP {
   created_at: string;
 }
 
+export interface BirthdayInfo {
+  id: string;
+  birthday_person_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AuthResponse {
   success: boolean;
   token?: string;
@@ -97,5 +104,23 @@ export const api = {
 
   setToken(token: string) {
     authToken = token;
+  },
+
+  async getBirthdayInfo(): Promise<BirthdayInfo | null> {
+    const response = await fetch(`${API_BASE}/rsvps.php?action=get_birthday_info`);
+    const data = await response.json();
+    return data.length > 0 ? data[0] : null;
+  },
+
+  async updateBirthdayInfo(name: string) {
+    const response = await fetch(`${API_BASE}/rsvps.php`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({ birthday_person_name: name }),
+    });
+    return response.json();
   }
 };

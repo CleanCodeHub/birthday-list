@@ -82,8 +82,19 @@ if ($method === 'PATCH') {
         exit();
     }
 
-    $stmt = $pdo->prepare('UPDATE birthday_info SET birthday_person_name = ?, updated_at = CURRENT_TIMESTAMP');
-    $stmt->execute([$birthday_person_name]);
+    // Check if birthday_info exists
+    $stmt = $pdo->query('SELECT id FROM birthday_info LIMIT 1');
+    $exists = $stmt->fetch();
+
+    if ($exists) {
+        $stmt = $pdo->prepare('UPDATE birthday_info SET birthday_person_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+        $stmt->execute([$birthday_person_name, $exists['id']]);
+    } else {
+        // Create if doesn't exist
+        $id = generateUUID();
+        $stmt = $pdo->prepare('INSERT INTO birthday_info (id, birthday_person_name) VALUES (?, ?)');
+        $stmt->execute([$id, $birthday_person_name]);
+    }
 
     echo json_encode(['success' => true]);
     exit();

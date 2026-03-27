@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { UserPlus } from 'lucide-react';
 import { api } from '../lib/supabase';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface RsvpFormProps {
   onSuccess: () => void;
 }
 
 export function RsvpForm({ onSuccess }: RsvpFormProps) {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [attending, setAttending] = useState<boolean | null>(null);
   const [adults, setAdults] = useState(0);
@@ -20,17 +22,17 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
     setError('');
 
     if (!name.trim()) {
-      setError('Please enter your name');
+      setError(t.rsvpForm.errorName);
       return;
     }
 
     if (attending === null) {
-      setError('Please select whether you will attend');
+      setError(t.rsvpForm.errorAttending);
       return;
     }
 
     if (attending && adults === 0 && kids === 0) {
-      setError('Please specify at least one adult or kid attending');
+      setError(t.rsvpForm.errorGuests);
       return;
     }
 
@@ -46,7 +48,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
       });
 
       if (result.error) {
-        setError('Failed to submit RSVP. Please try again.');
+        setError(t.rsvpForm.errorSubmit);
         setIsSubmitting(false);
         return;
       }
@@ -58,7 +60,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
       setComment('');
       onSuccess();
     } catch (err) {
-      setError('Failed to submit RSVP. Please try again.');
+      setError(t.rsvpForm.errorSubmit);
       console.error(err);
     }
 
@@ -71,7 +73,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
         <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-3 rounded-xl">
           <UserPlus className="w-6 h-6 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-800">RSVP to the Party</h2>
+        <h2 className="text-2xl font-bold text-gray-800">{t.rsvpForm.title}</h2>
       </div>
 
       {error && (
@@ -82,7 +84,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
 
       <div>
         <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-          Your Name
+          {t.rsvpForm.yourName}
         </label>
         <input
           type="text"
@@ -90,13 +92,13 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-          placeholder="Enter your name"
+          placeholder={t.rsvpForm.namePlaceholder}
         />
       </div>
 
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-3">
-          Will you attend?
+          {t.rsvpForm.willAttend}
         </label>
         <div className="grid grid-cols-2 gap-4">
           <button
@@ -108,7 +110,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Yes, I'll be there!
+            {t.rsvpForm.yesAttend}
           </button>
           <button
             type="button"
@@ -119,7 +121,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            No, I can't make it
+            {t.rsvpForm.noAttend}
           </button>
         </div>
       </div>
@@ -128,7 +130,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="adults" className="block text-sm font-semibold text-gray-700 mb-2">
-              Adults
+              {t.rsvpForm.adults}
             </label>
             <input
               type="number"
@@ -142,7 +144,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
 
           <div>
             <label htmlFor="kids" className="block text-sm font-semibold text-gray-700 mb-2">
-              Kids
+              {t.rsvpForm.kids}
             </label>
             <input
               type="number"
@@ -158,7 +160,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
 
       <div>
         <label htmlFor="comment" className="block text-sm font-semibold text-gray-700 mb-2">
-          Comment (Optional)
+          {t.rsvpForm.comment}
         </label>
         <textarea
           id="comment"
@@ -166,7 +168,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
           onChange={(e) => setComment(e.target.value)}
           rows={3}
           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none"
-          placeholder="Any dietary restrictions, wishes, or messages..."
+          placeholder={t.rsvpForm.commentPlaceholder}
         />
       </div>
 
@@ -175,7 +177,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
         disabled={isSubmitting}
         className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-emerald-600 hover:to-teal-700 transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
       >
-        {isSubmitting ? 'Submitting...' : 'Submit RSVP'}
+        {isSubmitting ? t.rsvpForm.submitting : t.rsvpForm.submit}
       </button>
     </form>
   );

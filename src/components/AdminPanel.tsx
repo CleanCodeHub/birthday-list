@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Users, Baby, MessageSquare, CreditCard as Edit2, Trash2, Save, X, LogOut, Cake } from 'lucide-react';
 import { RSVP, api } from '../lib/supabase';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface AdminPanelProps {
   rsvps: RSVP[];
@@ -9,6 +10,7 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
+  const { t } = useLanguage();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: '', attending: true, adults: 0, kids: 0, comment: '' });
   const [birthdayPersonName, setBirthdayPersonName] = useState('');
@@ -88,8 +90,8 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
   };
 
   const handleDeleteAll = async () => {
-    if (!confirm('Are you sure you want to delete ALL RSVPs? This cannot be undone!')) return;
-    if (!confirm('Really delete everything? This is your last chance!')) return;
+    if (!confirm(t.admin.confirmDeleteAll)) return;
+    if (!confirm(t.admin.confirmDeleteAll)) return;
 
     try {
       await api.deleteAllRsvps();
@@ -104,21 +106,21 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
       <div className="flex items-center justify-between bg-gradient-to-r from-red-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center gap-3">
           <Lock className="w-6 h-6" />
-          <h2 className="text-2xl font-bold">Admin Mode</h2>
+          <h2 className="text-2xl font-bold">{t.admin.dashboard}</h2>
         </div>
         <button
           onClick={onLogout}
           className="flex items-center gap-2 bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-all"
         >
           <LogOut className="w-4 h-4" />
-          Logout
+          {t.admin.logout}
         </button>
       </div>
 
       <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
         <div className="flex items-center gap-3 mb-4">
           <Cake className="w-6 h-6 text-pink-500" />
-          <h3 className="text-xl font-bold text-gray-800">Birthday Person</h3>
+          <h3 className="text-xl font-bold text-gray-800">{t.admin.birthdayPerson}</h3>
         </div>
         {isEditingBirthday ? (
           <div className="flex gap-2">
@@ -134,7 +136,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
               className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors"
             >
               <Save className="w-4 h-4" />
-              Save
+              {t.admin.save}
             </button>
             <button
               onClick={() => {
@@ -144,7 +146,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
               className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
             >
               <X className="w-4 h-4" />
-              Cancel
+              {t.admin.cancel}
             </button>
           </div>
         ) : (
@@ -155,7 +157,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
               className="flex items-center gap-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition-colors"
             >
               <Edit2 className="w-4 h-4" />
-              Edit
+              {t.admin.edit}
             </button>
           </div>
         )}
@@ -165,7 +167,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm font-medium mb-1">Total Guests</p>
+              <p className="text-blue-100 text-sm font-medium mb-1">{t.admin.totalGuests}</p>
               <p className="text-4xl font-bold">{totalGuests}</p>
             </div>
             <Users className="w-12 h-12 text-blue-200" />
@@ -175,7 +177,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
         <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-emerald-100 text-sm font-medium mb-1">Adults</p>
+              <p className="text-emerald-100 text-sm font-medium mb-1">{t.admin.adults}</p>
               <p className="text-4xl font-bold">{totalAdults}</p>
             </div>
             <Users className="w-12 h-12 text-emerald-200" />
@@ -185,7 +187,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
         <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-amber-100 text-sm font-medium mb-1">Kids</p>
+              <p className="text-amber-100 text-sm font-medium mb-1">{t.admin.kids}</p>
               <p className="text-4xl font-bold">{totalKids}</p>
             </div>
             <Baby className="w-12 h-12 text-amber-200" />
@@ -202,7 +204,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
               className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
-              Delete All
+              {t.admin.deleteAll}
             </button>
           )}
         </div>
@@ -226,7 +228,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
                       placeholder="Name"
                     />
                     <div>
-                      <label className="block text-sm text-gray-600 mb-2">Attending?</label>
+                      <label className="block text-sm text-gray-600 mb-2">{t.admin.attendingQuestion}</label>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
@@ -237,7 +239,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
-                          Yes
+                          {t.admin.yes}
                         </button>
                         <button
                           type="button"
@@ -248,14 +250,14 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
-                          No
+                          {t.admin.no}
                         </button>
                       </div>
                     </div>
                     {editForm.attending && (
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm text-gray-600 mb-1">Adults</label>
+                          <label className="block text-sm text-gray-600 mb-1">{t.admin.adults}</label>
                           <input
                             type="number"
                             min="0"
@@ -267,7 +269,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm text-gray-600 mb-1">Kids</label>
+                          <label className="block text-sm text-gray-600 mb-1">{t.admin.kids}</label>
                           <input
                             type="number"
                             min="0"
@@ -293,14 +295,14 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
                         className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors"
                       >
                         <Save className="w-4 h-4" />
-                        Save
+                        {t.admin.save}
                       </button>
                       <button
                         onClick={handleCancelEdit}
                         className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
                       >
                         <X className="w-4 h-4" />
-                        Cancel
+                        {t.admin.cancel}
                       </button>
                     </div>
                   </div>
@@ -314,16 +316,16 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
                             ? 'bg-emerald-100 text-emerald-700'
                             : 'bg-red-100 text-red-700'
                         }`}>
-                          {rsvp.attending ? 'Attending' : 'Not Attending'}
+                          {rsvp.attending ? t.admin.attending : t.admin.notAttending}
                         </span>
                       </div>
                       {rsvp.attending && (
                         <div className="flex gap-2">
                           <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-medium text-sm">
-                            {rsvp.adults} {rsvp.adults === 1 ? 'adult' : 'adults'}
+                            {rsvp.adults} {rsvp.adults === 1 ? t.admin.adult : t.admin.adultsPlural}
                           </span>
                           <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-medium text-sm">
-                            {rsvp.kids} {rsvp.kids === 1 ? 'kid' : 'kids'}
+                            {rsvp.kids} {rsvp.kids === 1 ? t.admin.kid : t.admin.kidsPlural}
                           </span>
                         </div>
                       )}
@@ -342,14 +344,14 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
                         className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm transition-colors"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
-                        Edit
+                        {t.admin.edit}
                       </button>
                       <button
                         onClick={() => handleDelete(rsvp.id)}
                         className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        Delete
+                        {t.admin.delete}
                       </button>
                     </div>
                   </>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Lock, X } from 'lucide-react';
 import { api } from '../lib/supabase';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface AdminLoginProps {
   onClose: () => void;
@@ -8,6 +9,7 @@ interface AdminLoginProps {
 }
 
 export function AdminLogin({ onClose, onSuccess }: AdminLoginProps) {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +52,7 @@ export function AdminLogin({ onClose, onSuccess }: AdminLoginProps) {
           <div className="bg-gradient-to-br from-red-500 to-orange-600 p-3 rounded-xl">
             <Lock className="w-6 h-6 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800">Admin Login</h2>
+          <h2 className="text-2xl font-bold text-gray-800">{t.login.title}</h2>
         </div>
 
         {error && (
@@ -62,7 +64,7 @@ export function AdminLogin({ onClose, onSuccess }: AdminLoginProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-              Email
+              {t.login.email}
             </label>
             <input
               type="email"
@@ -71,13 +73,13 @@ export function AdminLogin({ onClose, onSuccess }: AdminLoginProps) {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-              placeholder="admin@example.com"
+              placeholder={t.login.emailPlaceholder}
             />
           </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-              Password
+              {t.login.password}
             </label>
             <input
               type="password"
@@ -86,7 +88,7 @@ export function AdminLogin({ onClose, onSuccess }: AdminLoginProps) {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-              placeholder="Enter your password"
+              placeholder={t.login.password}
             />
           </div>
 
@@ -95,7 +97,7 @@ export function AdminLogin({ onClose, onSuccess }: AdminLoginProps) {
             disabled={isSubmitting}
             className="w-full bg-gradient-to-r from-red-500 to-orange-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-red-600 hover:to-orange-700 transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
           >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? t.login.loggingIn : t.login.login}
           </button>
         </form>
       </div>

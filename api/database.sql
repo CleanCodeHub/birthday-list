@@ -8,6 +8,7 @@ USE birthday_rsvp;
 CREATE TABLE IF NOT EXISTS rsvps (
   id VARCHAR(36) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
+  attending BOOLEAN DEFAULT TRUE,
   adults INT DEFAULT 0,
   kids INT DEFAULT 0,
   comment TEXT,

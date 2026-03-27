@@ -1,5 +1,5 @@
 import { Users, Baby, MessageSquare } from 'lucide-react';
-import { RSVP } from '../lib/supabase';
+import { RSVP } from '../lib/api';
 import { useLanguage } from '../i18n/LanguageContext';
 
 interface RsvpSummaryProps {

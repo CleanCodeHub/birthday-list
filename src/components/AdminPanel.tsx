@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Users, Baby, MessageSquare, CreditCard as Edit2, Trash2, Save, X, LogOut, Cake } from 'lucide-react';
-import { RSVP, api } from '../lib/supabase';
+import { RSVP, api } from '../lib/api';
 import { useLanguage } from '../i18n/LanguageContext';
 
 interface AdminPanelProps {

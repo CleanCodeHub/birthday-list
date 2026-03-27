@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Lock, X } from 'lucide-react';
-import { api } from '../lib/supabase';
+import { api } from '../lib/api';
 import { useLanguage } from '../i18n/LanguageContext';
 
 interface AdminLoginProps {

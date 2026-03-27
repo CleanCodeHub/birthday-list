@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { UserPlus } from 'lucide-react';
-import { api } from '../lib/supabase';
+import { api } from '../lib/api';
 import { useLanguage } from '../i18n/LanguageContext';
 
 interface RsvpFormProps {

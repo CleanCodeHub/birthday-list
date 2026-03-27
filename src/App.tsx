@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Cake } from 'lucide-react';
-import { api, RSVP } from './lib/supabase';
+import { api, RSVP } from './lib/api';
 import { RsvpForm } from './components/RsvpForm';
 import { RsvpSummary } from './components/RsvpSummary';
 import { AdminLogin } from './components/AdminLogin';

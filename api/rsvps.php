@@ -26,6 +26,7 @@ if ($method === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
 
     $name = $data['name'] ?? '';
+    $attending = $data['attending'] ?? true;
     $adults = $data['adults'] ?? 0;
     $kids = $data['kids'] ?? 0;
     $comment = $data['comment'] ?? null;
@@ -38,8 +39,8 @@ if ($method === 'POST') {
 
     $id = generateUUID();
 
-    $stmt = $pdo->prepare('INSERT INTO rsvps (id, name, adults, kids, comment) VALUES (?, ?, ?, ?, ?)');
-    $stmt->execute([$id, $name, $adults, $kids, $comment]);
+    $stmt = $pdo->prepare('INSERT INTO rsvps (id, name, attending, adults, kids, comment) VALUES (?, ?, ?, ?, ?, ?)');
+    $stmt->execute([$id, $name, $attending ? 1 : 0, $adults, $kids, $comment]);
 
     echo json_encode(['success' => true, 'id' => $id]);
     exit();
@@ -52,6 +53,7 @@ if ($method === 'PUT') {
     $data = json_decode(file_get_contents('php://input'), true);
     $id = $data['id'] ?? '';
     $name = $data['name'] ?? '';
+    $attending = $data['attending'] ?? true;
     $adults = $data['adults'] ?? 0;
     $kids = $data['kids'] ?? 0;
     $comment = $data['comment'] ?? null;
@@ -62,8 +64,8 @@ if ($method === 'PUT') {
         exit();
     }
 
-    $stmt = $pdo->prepare('UPDATE rsvps SET name = ?, adults = ?, kids = ?, comment = ? WHERE id = ?');
-    $stmt->execute([$name, $adults, $kids, $comment, $id]);
+    $stmt = $pdo->prepare('UPDATE rsvps SET name = ?, attending = ?, adults = ?, kids = ?, comment = ? WHERE id = ?');
+    $stmt->execute([$name, $attending ? 1 : 0, $adults, $kids, $comment, $id]);
 
     echo json_encode(['success' => true]);
     exit();

@@ -8,6 +8,7 @@ interface RsvpFormProps {
 
 export function RsvpForm({ onSuccess }: RsvpFormProps) {
   const [name, setName] = useState('');
+  const [attending, setAttending] = useState<boolean | null>(null);
   const [adults, setAdults] = useState(0);
   const [kids, setKids] = useState(0);
   const [comment, setComment] = useState('');
@@ -23,7 +24,12 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
       return;
     }
 
-    if (adults === 0 && kids === 0) {
+    if (attending === null) {
+      setError('Please select whether you will attend');
+      return;
+    }
+
+    if (attending && adults === 0 && kids === 0) {
       setError('Please specify at least one adult or kid attending');
       return;
     }
@@ -33,8 +39,9 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
     try {
       const result = await api.createRsvp({
         name: name.trim(),
-        adults,
-        kids,
+        attending,
+        adults: attending ? adults : 0,
+        kids: attending ? kids : 0,
         comment: comment.trim() || null,
       });
 
@@ -45,6 +52,7 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
       }
 
       setName('');
+      setAttending(null);
       setAdults(0);
       setKids(0);
       setComment('');
@@ -86,35 +94,67 @@ export function RsvpForm({ onSuccess }: RsvpFormProps) {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="adults" className="block text-sm font-semibold text-gray-700 mb-2">
-            Adults
-          </label>
-          <input
-            type="number"
-            id="adults"
-            min="0"
-            value={adults}
-            onChange={(e) => setAdults(parseInt(e.target.value) || 0)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="kids" className="block text-sm font-semibold text-gray-700 mb-2">
-            Kids
-          </label>
-          <input
-            type="number"
-            id="kids"
-            min="0"
-            value={kids}
-            onChange={(e) => setKids(parseInt(e.target.value) || 0)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-          />
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-3">
+          Will you attend?
+        </label>
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            type="button"
+            onClick={() => setAttending(true)}
+            className={`py-4 px-6 rounded-xl font-semibold transition-all ${
+              attending === true
+                ? 'bg-emerald-500 text-white shadow-lg scale-105'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Yes, I'll be there!
+          </button>
+          <button
+            type="button"
+            onClick={() => setAttending(false)}
+            className={`py-4 px-6 rounded-xl font-semibold transition-all ${
+              attending === false
+                ? 'bg-red-500 text-white shadow-lg scale-105'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            No, I can't make it
+          </button>
         </div>
       </div>
+
+      {attending === true && (
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="adults" className="block text-sm font-semibold text-gray-700 mb-2">
+              Adults
+            </label>
+            <input
+              type="number"
+              id="adults"
+              min="0"
+              value={adults}
+              onChange={(e) => setAdults(parseInt(e.target.value) || 0)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="kids" className="block text-sm font-semibold text-gray-700 mb-2">
+              Kids
+            </label>
+            <input
+              type="number"
+              id="kids"
+              min="0"
+              value={kids}
+              onChange={(e) => setKids(parseInt(e.target.value) || 0)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+            />
+          </div>
+        </div>
+      )}
 
       <div>
         <label htmlFor="comment" className="block text-sm font-semibold text-gray-700 mb-2">

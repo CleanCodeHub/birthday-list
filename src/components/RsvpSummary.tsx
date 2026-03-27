@@ -6,8 +6,9 @@ interface RsvpSummaryProps {
 }
 
 export function RsvpSummary({ rsvps }: RsvpSummaryProps) {
-  const totalAdults = rsvps.reduce((sum, rsvp) => sum + rsvp.adults, 0);
-  const totalKids = rsvps.reduce((sum, rsvp) => sum + rsvp.kids, 0);
+  const attendingRsvps = rsvps.filter(r => r.attending);
+  const totalAdults = attendingRsvps.reduce((sum, rsvp) => sum + rsvp.adults, 0);
+  const totalKids = attendingRsvps.reduce((sum, rsvp) => sum + rsvp.kids, 0);
   const totalGuests = totalAdults + totalKids;
 
   return (
@@ -54,18 +55,33 @@ export function RsvpSummary({ rsvps }: RsvpSummaryProps) {
             {rsvps.map((rsvp) => (
               <div
                 key={rsvp.id}
-                className="border border-gray-200 rounded-xl p-5 hover:border-emerald-300 hover:shadow-md transition-all"
+                className={`border rounded-xl p-5 hover:shadow-md transition-all ${
+                  rsvp.attending
+                    ? 'border-gray-200 hover:border-emerald-300'
+                    : 'border-gray-200 hover:border-red-300 bg-gray-50'
+                }`}
               >
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-gray-800">{rsvp.name}</h3>
-                  <div className="flex gap-4 text-sm">
-                    <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-medium">
-                      {rsvp.adults} {rsvp.adults === 1 ? 'adult' : 'adults'}
-                    </span>
-                    <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-medium">
-                      {rsvp.kids} {rsvp.kids === 1 ? 'kid' : 'kids'}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">{rsvp.name}</h3>
+                    <span className={`inline-block mt-1 px-3 py-1 rounded-full font-medium text-sm ${
+                      rsvp.attending
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}>
+                      {rsvp.attending ? 'Attending' : 'Not Attending'}
                     </span>
                   </div>
+                  {rsvp.attending && (
+                    <div className="flex gap-4 text-sm">
+                      <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-medium">
+                        {rsvp.adults} {rsvp.adults === 1 ? 'adult' : 'adults'}
+                      </span>
+                      <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-medium">
+                        {rsvp.kids} {rsvp.kids === 1 ? 'kid' : 'kids'}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {rsvp.comment && (

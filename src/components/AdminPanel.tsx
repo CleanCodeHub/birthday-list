@@ -10,11 +10,13 @@ interface AdminPanelProps {
 
 export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', adults: 0, kids: 0, comment: '' });
+  const [editForm, setEditForm] = useState({ name: '', attending: true, adults: 0, kids: 0, comment: '' });
   const [birthdayPersonName, setBirthdayPersonName] = useState('');
   const [isEditingBirthday, setIsEditingBirthday] = useState(false);
-  const totalAdults = rsvps.reduce((sum, rsvp) => sum + rsvp.adults, 0);
-  const totalKids = rsvps.reduce((sum, rsvp) => sum + rsvp.kids, 0);
+  const attendingRsvps = rsvps.filter(r => r.attending);
+  const notAttendingRsvps = rsvps.filter(r => !r.attending);
+  const totalAdults = attendingRsvps.reduce((sum, rsvp) => sum + rsvp.adults, 0);
+  const totalKids = attendingRsvps.reduce((sum, rsvp) => sum + rsvp.kids, 0);
   const totalGuests = totalAdults + totalKids;
 
   useEffect(() => {
@@ -46,6 +48,7 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
     setEditingId(rsvp.id);
     setEditForm({
       name: rsvp.name,
+      attending: rsvp.attending,
       adults: rsvp.adults,
       kids: rsvp.kids,
       comment: rsvp.comment || '',
@@ -54,15 +57,16 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setEditForm({ name: '', adults: 0, kids: 0, comment: '' });
+    setEditForm({ name: '', attending: true, adults: 0, kids: 0, comment: '' });
   };
 
   const handleSave = async (id: string) => {
     try {
       await api.updateRsvp(id, {
         name: editForm.name,
-        adults: editForm.adults,
-        kids: editForm.kids,
+        attending: editForm.attending,
+        adults: editForm.attending ? editForm.adults : 0,
+        kids: editForm.attending ? editForm.kids : 0,
         comment: editForm.comment || null,
       });
       setEditingId(null);
@@ -221,32 +225,61 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                       placeholder="Name"
                     />
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm text-gray-600 mb-1">Adults</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={editForm.adults}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, adults: parseInt(e.target.value) || 0 })
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm text-gray-600 mb-1">Kids</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={editForm.kids}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, kids: parseInt(e.target.value) || 0 })
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                        />
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-2">Attending?</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditForm({ ...editForm, attending: true })}
+                          className={`py-2 px-4 rounded-lg font-medium transition-all ${
+                            editForm.attending
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditForm({ ...editForm, attending: false })}
+                          className={`py-2 px-4 rounded-lg font-medium transition-all ${
+                            !editForm.attending
+                              ? 'bg-red-500 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          No
+                        </button>
                       </div>
                     </div>
+                    {editForm.attending && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">Adults</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={editForm.adults}
+                            onChange={(e) =>
+                              setEditForm({ ...editForm, adults: parseInt(e.target.value) || 0 })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">Kids</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={editForm.kids}
+                            onChange={(e) =>
+                              setEditForm({ ...editForm, kids: parseInt(e.target.value) || 0 })
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          />
+                        </div>
+                      </div>
+                    )}
                     <textarea
                       value={editForm.comment}
                       onChange={(e) => setEditForm({ ...editForm, comment: e.target.value })}
@@ -274,15 +307,26 @@ export function AdminPanel({ rsvps, onUpdate, onLogout }: AdminPanelProps) {
                 ) : (
                   <>
                     <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-gray-800">{rsvp.name}</h3>
-                      <div className="flex gap-2">
-                        <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-medium text-sm">
-                          {rsvp.adults} {rsvp.adults === 1 ? 'adult' : 'adults'}
-                        </span>
-                        <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-medium text-sm">
-                          {rsvp.kids} {rsvp.kids === 1 ? 'kid' : 'kids'}
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-800">{rsvp.name}</h3>
+                        <span className={`inline-block mt-1 px-3 py-1 rounded-full font-medium text-sm ${
+                          rsvp.attending
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}>
+                          {rsvp.attending ? 'Attending' : 'Not Attending'}
                         </span>
                       </div>
+                      {rsvp.attending && (
+                        <div className="flex gap-2">
+                          <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-medium text-sm">
+                            {rsvp.adults} {rsvp.adults === 1 ? 'adult' : 'adults'}
+                          </span>
+                          <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-medium text-sm">
+                            {rsvp.kids} {rsvp.kids === 1 ? 'kid' : 'kids'}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {rsvp.comment && (
